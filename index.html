@@ -58,7 +58,7 @@
     background:radial-gradient(120% 90% at 50% -10%, #0a1430 0%, var(--bg) 55%);
   }
   .grain{
-    position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.05;mix-blend-mode:overlay;
+    position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.035;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
   .page{position:relative;z-index:2}
@@ -113,7 +113,7 @@
     max-width:var(--maxw);margin-inline:auto;
     padding:18px var(--gutter);
   }
-  nav.scrolled{backdrop-filter:blur(16px);background:rgba(5,8,22,.6);border-bottom:1px solid var(--line)}
+  nav.scrolled{backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);background:rgba(5,8,22,.82);border-bottom:1px solid var(--line)}
   nav.scrolled .bar{padding-block:13px}
   .brand{display:flex;align-items:center;gap:.7rem;font-family:"Inter Tight";font-weight:700;font-size:1.18rem;letter-spacing:-.01em}
   .brand .mark{
@@ -409,8 +409,7 @@
     background:
       radial-gradient(60% 80% at 15% 0%,rgba(90,185,160,.12),transparent),
       radial-gradient(50% 70% at 90% 100%,rgba(193,223,240,.08),transparent),
-      linear-gradient(180deg,rgba(18,25,47,.7),rgba(5,8,22,.85));
-    backdrop-filter:blur(16px);
+      linear-gradient(180deg,rgba(18,25,47,.82),rgba(5,8,22,.9));
     padding:clamp(30px,5vw,68px);
     box-shadow:0 60px 160px -60px rgba(0,0,0,.95);
   }
@@ -472,8 +471,7 @@
       <a href="#trust">Trust</a>
     </div>
     <div class="nav-cta">
-      <a class="ghost-link nav-links" href="#early" style="display:inline">Sign in</a>
-      <a class="btn btn-primary" href="#early">Request access</a>
+      <a class="btn btn-primary" href="#early">Join waitlist <span class="arrow">→</span></a>
     </div>
   </div>
 </nav>
@@ -490,7 +488,7 @@
       </h1>
       <p class="sub">The infrastructure layer that lets hospitals, governments, and digital platforms communicate with Deaf and Hard of Hearing users in real time.</p>
       <div class="hero-cta">
-        <a class="btn btn-primary" href="#early">Request early access <span class="arrow">→</span></a>
+        <a class="btn btn-primary" href="#early">Join the waitlist <span class="arrow">→</span></a>
         <a class="btn btn-ghost" href="#how"><span class="play-i" aria-hidden="true"></span> Watch platform demo</a>
       </div>
       <div class="trusted">
@@ -780,15 +778,16 @@
 <section class="sec early wrap" id="early">
   <div class="ea-panel reveal">
     <div class="ea-top">
-      <span class="eyebrow">Early access</span>
-      <h2>Choose how you want to build the future of accessible communication.</h2>
+      <span class="eyebrow">Join the waitlist</span>
+      <h2>Be first in line as accessible communication becomes infrastructure.</h2>
+      <p class="lead" style="margin-top:1.3rem">Join the waitlist and tell us how you want to take part — we're onboarding early partners in waves.</p>
     </div>
     <div class="ea-paths">
       <div class="path" tabindex="0">
         <div class="pn">For institutions</div>
         <h3>Deploy Neosignis</h3>
         <p>Hospitals, agencies, and platforms ready to make every interaction accessible. Pilot with our team.</p>
-        <span class="go">Request a pilot <span class="arrow">→</span></span>
+        <span class="go">Join the waitlist <span class="arrow">→</span></span>
       </div>
       <div class="path" tabindex="0">
         <div class="pn">For the community</div>
@@ -861,6 +860,14 @@
   };
   const rgba=(c,a)=>`rgba(${c[0]},${c[1]},${c[2]},${a})`;
 
+  /* Visibility gate: off-screen canvases stop animating → smooth scrolling.
+     Auto-observes an element the first time it's queried. */
+  const Vis=(()=>{
+    const map=new WeakMap();
+    const io=new IntersectionObserver(es=>es.forEach(e=>map.set(e.target,e.isIntersecting)),{rootMargin:"120px"});
+    return {on(el){ if(el&&!map.has(el)){map.set(el,false);io.observe(el);} return !!map.get(el)&&!document.hidden; }};
+  })();
+
   /* ============ NAV scroll state ============ */
   const nav=document.getElementById("nav");
   const onScroll=()=>{ nav.classList.toggle("scrolled", window.scrollY>30); };
@@ -868,7 +875,7 @@
 
   /* ============ Helper: hi-dpi canvas ============ */
   function fit(canvas){
-    const dpr=Math.min(window.devicePixelRatio||1, 2);
+    const dpr=Math.min(window.devicePixelRatio||1, 1.5);
     const r=canvas.getBoundingClientRect();
     canvas.width=Math.max(1,r.width*dpr);
     canvas.height=Math.max(1,r.height*dpr);
@@ -930,18 +937,20 @@
     gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
     const uRes=gl.getUniformLocation(prog,"u_res"),uTime=gl.getUniformLocation(prog,"u_time");
     function resize(){
-      const dpr=Math.min(window.devicePixelRatio||1,1.5);
+      const dpr=Math.min(window.devicePixelRatio||1,1.25);
       canvas.width=innerWidth*dpr;canvas.height=innerHeight*dpr;
       gl.viewport(0,0,canvas.width,canvas.height);
     }
     resize();window.addEventListener("resize",resize);
     const start=performance.now();
-    let raf;
+    let raf,lastF=0;
     function loop(now){
+      raf=requestAnimationFrame(loop);
+      if(document.hidden) return;
+      if(now-lastF<33) return; lastF=now;
       gl.uniform2f(uRes,canvas.width,canvas.height);
       gl.uniform1f(uTime,(now-start)/1000);
       gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
-      raf=requestAnimationFrame(loop);
     }
     if(reduceMotion){ gl.uniform2f(uRes,canvas.width,canvas.height); gl.uniform1f(uTime,3.0); gl.drawArrays(gl.TRIANGLE_STRIP,0,4); }
     else raf=requestAnimationFrame(loop);
@@ -980,6 +989,7 @@
     resize();window.addEventListener("resize",resize);
     let t0=performance.now();
     function draw(now){
+      if(!Vis.on(canvas)){requestAnimationFrame(draw);return;}
       const time=(now-t0)/1000;
       ctx.clearRect(0,0,w,h);
       // connection path
@@ -1041,6 +1051,7 @@
     const pts=[];for(let i=0;i<7;i++)pts.push({a:Math.random()*7,sp:0.5+Math.random()});
     let t0=performance.now();
     function draw(now){
+      if(!Vis.on(canvas)){requestAnimationFrame(draw);return;}
       const time=(now-t0)/1000;
       ctx.clearRect(0,0,w,h);
       const cx=w/2,cy=h/2;
@@ -1075,6 +1086,7 @@
     ];
     let li=0;
     function typeLine(){
+      if(!Vis.on(txt)){setTimeout(typeLine,500);return;}
       const line=lines[li];
       who.textContent=line.w;
       who.style.color = line.w.includes("Patient") ? "var(--highlight)" : "var(--accent)";
@@ -1119,6 +1131,7 @@
     const nodes=[...archEl.querySelectorAll(".node")];
     let t0=performance.now();
     function tick(now){
+      if(!Vis.on(archEl)){requestAnimationFrame(tick);return;}
       const t=(now-t0)/1000;
       dots.forEach((d)=>{
         let p=((reduceMotion?0.4:(t*0.13))+d.off)%1;
@@ -1144,8 +1157,10 @@
       function resize(){const r=fit(canvas);ctx=r.ctx;w=r.w;h=r.h;}
       resize();window.addEventListener("resize",resize);
       const seeds=[];for(let i=0;i<26;i++)seeds.push({x:Math.random(),y:Math.random(),r:Math.random(),ph:Math.random()*7});
-      let t0=performance.now()+Math.random()*1000;
+      let t0=performance.now()+Math.random()*1000,sk=0;
       function draw(now){
+        if(!Vis.on(canvas)){requestAnimationFrame(draw);return;}
+        if(sk++&1){requestAnimationFrame(draw);return;}
         const t=(now-t0)/1000;
         ctx.clearRect(0,0,w,h);
         // base gradient per kind
@@ -1178,8 +1193,10 @@
     function resize(){const r=fit(canvas);ctx=r.ctx;w=r.w;h=r.h;}
     resize();window.addEventListener("resize",resize);
     const ring1=8, ring2=14;
-    let t0=performance.now();
+    let t0=performance.now(),sk=0;
     function draw(now){
+      if(!Vis.on(canvas)){requestAnimationFrame(draw);return;}
+      if(sk++&1){requestAnimationFrame(draw);return;}
       const t=(now-t0)/1000;
       ctx.clearRect(0,0,w,h);
       const cx=w/2,cy=h/2;
@@ -1243,8 +1260,7 @@
       // timeline steps draw in
       gsap.from(".tl-step",{scrollTrigger:{trigger:".timeline",start:"top 80%"},opacity:0,x:-20,stagger:0.12,duration:.7,ease:"power2.out"});
 
-      // hero subtle background drift on scroll
-      gsap.to("#webgl",{yPercent:8,ease:"none",scrollTrigger:{trigger:"body",start:"top top",end:"bottom bottom",scrub:true}});
+      // (WebGL background stays fixed — scrubbing a full-screen canvas hurt scroll perf)
 
       // ---- horizontal pinned use-cases ----
       const track=document.getElementById("casesTrack");
