@@ -269,9 +269,11 @@
   @media(max-width:880px){.arch-grid{grid-template-columns:1fr;gap:1.6rem}.arch-svg{display:none}.arch-col.right{text-align:left}.arch-col.right .node{flex-direction:row}}
 
   /* ===== USE CASES (always-dark scene cards) ===== */
-  .cases-pin{position:relative}
-  .cases-track{display:flex;gap:clamp(18px,2vw,30px);will-change:transform}
-  .scene{flex:0 0 min(78vw,560px);height:min(72vh,560px);border-radius:24px;overflow:hidden;position:relative;border:1px solid var(--line-strong);display:flex;flex-direction:column;justify-content:flex-end;padding:clamp(22px,3vw,38px);background:#0A1430;color:var(--text);box-shadow:0 40px 110px -50px var(--shadow)}
+  .cases-wrap{position:relative}
+  .cases-track{display:flex;gap:clamp(18px,2vw,30px);overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:6px var(--gutter) 1.2rem;scrollbar-width:none;cursor:grab}
+  .cases-track::-webkit-scrollbar{display:none}
+  .cases-track.dragging{cursor:grabbing;scroll-snap-type:none}
+  .scene{flex:0 0 min(82vw,520px);height:min(66vh,520px);scroll-snap-align:center;border-radius:24px;overflow:hidden;position:relative;border:1px solid var(--line-strong);display:flex;flex-direction:column;justify-content:flex-end;padding:clamp(22px,3vw,38px);background:#0A1430;color:var(--text);box-shadow:0 40px 110px -50px var(--shadow)}
   .scene .bgart{position:absolute;inset:0;z-index:0}
   .scene::after{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(8,14,34,0) 30%,rgba(8,14,34,.85))}
   .scene .num{position:absolute;top:clamp(20px,3vw,34px);left:clamp(22px,3vw,38px);font-family:"Inter Tight";font-weight:700;color:var(--highlight);opacity:.7;font-size:.85rem;letter-spacing:.1em;z-index:2}
@@ -282,9 +284,14 @@
   .scene h3{font-size:clamp(1.5rem,3vw,2.2rem);font-weight:800;letter-spacing:-.03em}
   .scene .tag{font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);font-weight:600}
   .scene p{color:var(--highlight);opacity:.88;margin-top:.8rem;font-size:.95rem;max-width:38ch;font-weight:300}
-  .cases-hint{margin-top:1.4rem;font-size:.78rem;color:var(--muted);display:flex;align-items:center;gap:.6rem}
-  .cases-hint .bar{width:120px;height:3px;border-radius:3px;background:var(--line-strong);overflow:hidden;position:relative}
-  .cases-hint .bar i{position:absolute;left:0;top:0;height:100%;width:25%;background:var(--accent);border-radius:3px}
+  .cases-hint{margin-top:1.2rem;font-size:.78rem;color:var(--muted);display:flex;align-items:center;gap:.9rem;flex-wrap:wrap}
+  .cases-hint .bar{width:120px;height:3px;border-radius:3px;background:var(--line-strong);overflow:hidden;position:relative;flex:none}
+  .cases-hint .bar i{position:absolute;left:0;top:0;height:100%;width:28%;background:var(--accent);border-radius:3px;will-change:transform}
+  .cases-nav{display:flex;gap:.5rem;margin-left:auto}
+  .cnav{width:38px;height:38px;border-radius:10px;border:1px solid var(--line-strong);background:var(--ghost-bg);color:var(--text);display:grid;place-items:center;cursor:pointer;transition:.3s var(--ease);font-size:1.05rem;line-height:1}
+  .cnav:hover{border-color:var(--accent);color:var(--accent)}
+  .cnav:disabled{opacity:.35;cursor:default;border-color:var(--line)}
+  @media(max-width:560px){.cases-nav{display:none}}
 
   .community{background:radial-gradient(70% 60% at 50% 30%,var(--band),transparent)}
   .comm-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(34px,5vw,72px);align-items:center;margin-top:2.4rem}
@@ -323,6 +330,32 @@
   .ea-panel{margin-top:3rem;border-radius:28px;position:relative;overflow:hidden;border:1px solid var(--line-strong);background:radial-gradient(60% 80% at 15% 0%,rgba(94,139,255,.16),transparent),radial-gradient(50% 70% at 90% 100%,rgba(193,223,240,.08),transparent),linear-gradient(180deg,#0E1730,#070C1C);padding:clamp(30px,5vw,68px);box-shadow:0 60px 160px -60px var(--shadow)}
   .ea-top{max-width:54ch}
   .ea-top h2{font-size:var(--fs-h2);font-weight:800;letter-spacing:-.035em;color:var(--text)}
+  .ea-form{display:flex;gap:.7rem;margin-top:1.8rem;max-width:480px;flex-wrap:wrap}
+  .ea-form input[type="email"]{flex:1 1 240px;min-width:0;padding:.95em 1.1em;border-radius:999px;border:1px solid var(--line-strong);background:rgba(10,16,38,.6);color:var(--text);font-family:"Inter",sans-serif;font-size:.96rem;transition:.3s var(--ease)}
+  .ea-form input[type="email"]::placeholder{color:var(--muted)}
+  .ea-form input[type="email"]:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(110,150,255,.18)}
+  .ea-form .btn-primary{flex:0 0 auto}
+  .ea-form.sent{opacity:.6;pointer-events:none}
+  .ea-msg{margin-top:.9rem;font-size:.86rem;min-height:1.2em;color:var(--accent);font-weight:500}
+  .ea-msg.err{color:#ff9b8a}
+
+  /* ===== Waitlist popup ===== */
+  .popup{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(5,8,22,.5);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;transition:opacity .26s var(--ease)}
+  .popup.show{opacity:1}
+  .popup[hidden]{display:none}
+  .popup-card{background:var(--card);border:1px solid var(--line-strong);border-radius:22px;max-width:420px;width:100%;padding:2.4rem 2rem 2rem;text-align:center;position:relative;box-shadow:0 50px 130px -30px rgba(0,0,0,.5);transform:translateY(16px) scale(.96);transition:transform .3s var(--ease)}
+  .popup.show .popup-card{transform:none}
+  .popup-icon{width:60px;height:60px;border-radius:50%;margin:0 auto 1.2rem;display:grid;place-items:center;background:var(--accent-chip-bg);border:1px solid var(--accent-chip-br);color:var(--accent)}
+  .popup-icon svg{width:28px;height:28px}
+  .ic-alert{display:none}
+  .popup.is-err .popup-icon{background:rgba(255,120,100,.12);border-color:rgba(255,120,100,.32);color:#ff8a76}
+  .popup.is-err .ic-check{display:none}
+  .popup.is-err .ic-alert{display:block}
+  .popup-card h3{font-family:"Inter Tight";font-size:1.4rem;font-weight:700;letter-spacing:-.02em}
+  .popup-card p{color:var(--muted);font-size:.95rem;margin-top:.6rem}
+  .popup-card .btn{margin-top:1.7rem}
+  .popup-x{position:absolute;top:.8rem;right:1rem;background:none;border:none;color:var(--muted);font-size:1.5rem;line-height:1;cursor:pointer;transition:.3s;padding:.2rem .4rem;border-radius:8px}
+  .popup-x:hover{color:var(--text)}
   .ea-paths{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin-top:3rem}
   .path{border:1px solid var(--line);border-radius:18px;padding:1.8rem 1.6rem;background:var(--card-2);transition:.45s var(--ease);position:relative;overflow:hidden;cursor:pointer}
   .path:hover{border-color:var(--accent);transform:translateY(-6px);background:rgba(18,25,47,.75)}
@@ -378,7 +411,7 @@
         <svg class="ic-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.5 6.5 0 0 0 9.8 9.8z"/></svg>
         <svg class="ic-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="4.4"/><path d="M12 2v2M12 20v2M4 12H2M22 12h-2M5 5l1.4 1.4M17.6 17.6 19 19M19 5l-1.4 1.4M6.4 17.6 5 19"/></svg>
       </button>
-      <a class="btn btn-primary" href="#early">Join waitlist <span class="arrow">&#x2192;</span></a>
+      <a class="btn btn-primary" href="#early">Join waitlist <span class="arrow">→</span></a>
     </div>
   </div>
 </nav>
@@ -395,11 +428,11 @@
       </h1>
       <p class="sub">The infrastructure layer that lets hospitals, governments, and digital platforms communicate with Deaf and Hard of Hearing users in real time.</p>
       <div class="hero-cta">
-        <a class="btn btn-primary" href="#early">Join the waitlist <span class="arrow">&#x2192;</span></a>
+        <a class="btn btn-primary" href="#early">Join the waitlist <span class="arrow">→</span></a>
         <a class="btn btn-ghost" href="#how"><span class="play-i" aria-hidden="true"></span> Watch platform demo</a>
       </div>
       <div class="trusted">
-        <div class="tlabel">Trusted by future-forward institutions</div>
+        <div class="tlabel">Trusted by future forward institutions</div>
         <div class="logos" aria-label="Placeholder partner logos">
           <span class="logo"><span class="d"></span>Meridian Health</span>
           <span class="logo"><span class="d"></span>CivicGov</span>
@@ -416,7 +449,7 @@
         <div class="row">
           <span class="avatar">DR</span>
           <span>
-            <div class="who">Dr.</div>
+            <div class="who">Doctor</div>
             <div class="role">Speaking · captured</div>
           </span>
           <span class="pulse-dot" style="margin-left:.4rem"></span>
@@ -448,7 +481,7 @@
     </div>
     <div class="stat reveal">
       <div class="num">Hours<em>.</em></div>
-      <div class="desc">Typical wait to schedule an on-site interpreter. Care rarely waits that long.</div>
+      <div class="desc">Typical wait to schedule an on site interpreter. Care rarely waits that long.</div>
     </div>
   </div>
 
@@ -490,7 +523,7 @@
             </div>
           </div>
           <div class="caption">
-            <div class="who" id="capWho">Doctor speaking</div>
+            <div class="who" id="capWho">Doctor · speaking</div>
             <div class="txt" id="capTxt"><span class="car"></span></div>
           </div>
         </div>
@@ -549,7 +582,7 @@
 
         <div class="arch-col right">
           <div class="col-label">Accessible experiences</div>
-          <div class="node" data-side="out"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg></span>Live speech &#x2194; sign</div>
+          <div class="node" data-side="out"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg></span>Live speech ↔ sign</div>
           <div class="node" data-side="out"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg></span>Captioned records</div>
           <div class="node" data-side="out"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>On demand access</div>
           <div class="node" data-side="out"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM2 12h20M12 2c3 3 3 17 0 20M12 2c-3 3-3 17 0 20"/></svg></span>Any language pair</div>
@@ -565,11 +598,10 @@
     <span class="eyebrow">Where it runs</span>
     <h2>The same layer, four environments each with its own stakes.</h2>
   </div>
-  <div class="cases-pin" id="casesPin">
-    <div class="wrap">
-      <div class="cases-track" id="casesTrack">
+  <div class="cases-wrap">
+    <div class="cases-track" id="casesTrack">
 
-        <article class="scene reveal" data-art="health">
+        <article class="scene" data-art="health">
           <canvas class="bgart" aria-hidden="true"></canvas>
           <div class="num">01 Healthcare</div>
           <div class="ui"><div class="l">Consent confirmed</div><div class="v">Patient understood treatment options in their first language.</div></div>
@@ -580,10 +612,10 @@
           </div>
         </article>
 
-        <article class="scene reveal" data-art="enterprise">
+        <article class="scene" data-art="enterprise">
           <canvas class="bgart" aria-hidden="true"></canvas>
           <div class="num">02 Enterprise</div>
-          <div class="ui"><div class="l">All-hands · 1,400 joined</div><div class="v">Signed, captioned and translating in real time across regions.</div></div>
+          <div class="ui"><div class="l">All hands · 1,400 joined</div><div class="v">Signed and captioned in real time across regions.</div></div>
           <div class="scene-content">
             <div class="tag">Enterprise</div>
             <h3>Every meeting, accessible by default.</h3>
@@ -591,7 +623,7 @@
           </div>
         </article>
 
-        <article class="scene reveal" data-art="education">
+        <article class="scene" data-art="education">
           <canvas class="bgart" aria-hidden="true"></canvas>
           <div class="num">03 Education</div>
           <div class="ui"><div class="l">Lecture · live</div><div class="v">Sign track synced to the lesson, replayable on demand.</div></div>
@@ -602,7 +634,7 @@
           </div>
         </article>
 
-        <article class="scene reveal" data-art="gov">
+        <article class="scene" data-art="gov">
           <canvas class="bgart" aria-hidden="true"></canvas>
           <div class="num">04 Government</div>
           <div class="ui"><div class="l">Public service · open</div><div class="v">Citizens reach services directly, in sign.</div></div>
@@ -613,8 +645,16 @@
           </div>
         </article>
 
+    </div>
+    <div class="wrap">
+      <div class="cases-hint">
+        <span>Drag, scroll, or use the arrows to move through each environment</span>
+        <span class="bar"><i id="caseBar"></i></span>
+        <div class="cases-nav">
+          <button class="cnav" id="casePrev" aria-label="Previous use case">←</button>
+          <button class="cnav" id="caseNext" aria-label="Next use case">→</button>
+        </div>
       </div>
-      <div class="cases-hint"><span>Scroll to move through each environment</span><span class="bar"><i id="caseBar"></i></span></div>
     </div>
   </div>
 </section>
@@ -688,25 +728,35 @@
       <span class="eyebrow">Join the waitlist</span>
       <h2>Be first in line as accessible communication becomes infrastructure.</h2>
       <p class="lead" style="margin-top:1.3rem">Join the waitlist and tell us how you want to take part we're onboarding early partners in waves.</p>
+      <form class="ea-form" id="waitForm" action="https://formsubmit.co/info@neosignis.com" method="POST">
+        <input type="email" id="waitEmail" name="email" required autocomplete="email" placeholder="you@organization.com" aria-label="Email address" />
+        <button type="submit" class="btn btn-primary" id="waitBtn">Sign up <span class="arrow">→</span></button>
+        <!-- FormSubmit config -->
+        <input type="hidden" name="_subject" value="New Neosignis waitlist signup" />
+        <input type="hidden" name="_template" value="table" />
+        <input type="hidden" name="_captcha" value="false" />
+        <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off" aria-hidden="true" />
+      </form>
+      <p class="ea-msg" id="waitMsg" role="status" aria-live="polite"></p>
     </div>
     <div class="ea-paths">
       <div class="path" tabindex="0">
         <div class="pn">For institutions</div>
         <h3>Deploy Neosignis</h3>
         <p>Hospitals, agencies, and platforms ready to make every interaction accessible. Pilot with our team.</p>
-        <span class="go">Join the waitlist <span class="arrow">&#x2192;</span></span>
+        <span class="go">Join the waitlist <span class="arrow">→</span></span>
       </div>
       <div class="path" tabindex="0">
         <div class="pn">For the community</div>
         <h3>Contribute &amp; shape it</h3>
         <p>Deaf signers, linguists, and advocates who want a seat at the table and a share in what's built.</p>
-        <span class="go">Join the council <span class="arrow">&#x2192;</span></span>
+        <span class="go">Join the council <span class="arrow">→</span></span>
       </div>
       <div class="path" tabindex="0">
         <div class="pn">For investors</div>
         <h3>Back the layer</h3>
         <p>Partners funding accessibility infrastructure as a new category. See the roadmap and thesis.</p>
-        <span class="go">Talk to founders <span class="arrow">&#x2192;</span></span>
+        <span class="go">Talk to founders <span class="arrow">→</span></span>
       </div>
     </div>
   </div>
@@ -744,7 +794,7 @@
     </div>
     <div class="foot-bottom">
       <div class="legal">
-        <span>&#169; 2026 Neosignis, Inc.</span>
+        <span>© 2026 Neosignis, Inc.</span>
         <a href="#top">Privacy</a>
         <a href="#top">Terms</a>
         <a href="#top">Accessibility statement</a>
@@ -756,6 +806,20 @@
 
 </div><!-- /page -->
 
+<!-- WAITLIST POPUP -->
+<div class="popup" id="waitPopup" role="dialog" aria-modal="true" aria-labelledby="popupTitle" hidden>
+  <div class="popup-card">
+    <button class="popup-x" id="popupClose" aria-label="Close">&times;</button>
+    <div class="popup-icon" aria-hidden="true">
+      <svg class="ic-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.5 10 17.5 19 7"/></svg>
+      <svg class="ic-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v5M12 16.5v.5"/><circle cx="12" cy="12" r="9"/></svg>
+    </div>
+    <h3 id="popupTitle">You're on the list</h3>
+    <p id="popupText">Thanks for joining the Neosignis waitlist.</p>
+    <button class="btn btn-primary" id="popupOk">Done</button>
+  </div>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script>
@@ -763,23 +827,27 @@
   "use strict";
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  // theme-aware palettes for canvases (page-level visuals follow theme via C)
   function palette(dark){
     return dark
       ? {bg:[5,8,22],     accent:[94,139,255],  accent2:[120,150,235], high:[193,223,240]}
       : {bg:[255,255,255],accent:[30,58,138],   accent2:[43,76,155],   high:[50,87,201]};
   }
+  // fixed bright palette for the always-dark cards (scenes + avatar orb)
   const SCN = {bg:[10,18,42], accent:[122,158,255], accent2:[150,180,255], high:[193,223,240]};
 
-  let C = palette(false);
+  let C = palette(false);           // start in light mode
   window.__dark = 0;
   const rgba=(c,a)=>`rgba(${c[0]},${c[1]},${c[2]},${a})`;
 
+  /* Visibility gate: off-screen canvases stop animating → smooth scrolling. */
   const Vis=(()=>{
     const map=new WeakMap();
     const io=new IntersectionObserver(es=>es.forEach(e=>map.set(e.target,e.isIntersecting)),{rootMargin:"120px"});
     return {on(el){ if(el&&!map.has(el)){map.set(el,false);io.observe(el);} return !!map.get(el)&&!document.hidden; }};
   })();
 
+  /* ===== Theme toggle ===== */
   const tgl=document.getElementById("themeToggle");
   function setTheme(dark){
     document.documentElement.setAttribute("data-theme", dark?"dark":"light");
@@ -790,9 +858,75 @@
   if(tgl) tgl.addEventListener("click",()=>setTheme(window.__dark!==1));
   setTheme(false);
 
+  /* ===== NAV scroll state ===== */
   const nav=document.getElementById("nav");
   const onScroll=()=>nav.classList.toggle("scrolled", window.scrollY>30);
   onScroll(); window.addEventListener("scroll",onScroll,{passive:true});
+
+  /* ===== Waitlist popup ===== */
+  const Popup=(()=>{
+    const el=document.getElementById("waitPopup");
+    const titleEl=document.getElementById("popupTitle");
+    const textEl=document.getElementById("popupText");
+    let lastFocus=null;
+    function open(title,text,isErr){
+      if(!el) return;
+      titleEl.textContent=title; textEl.textContent=text;
+      el.classList.toggle("is-err",!!isErr);
+      lastFocus=document.activeElement;
+      el.hidden=false; requestAnimationFrame(()=>el.classList.add("show"));
+      const ok=document.getElementById("popupOk"); if(ok) ok.focus();
+    }
+    function close(){
+      if(!el) return;
+      el.classList.remove("show");
+      setTimeout(()=>{ el.hidden=true; },260);
+      if(lastFocus&&lastFocus.focus) lastFocus.focus();
+    }
+    if(el){
+      el.addEventListener("click",e=>{ if(e.target===el) close(); });
+      const x=document.getElementById("popupClose"); if(x) x.addEventListener("click",close);
+      const ok=document.getElementById("popupOk"); if(ok) ok.addEventListener("click",close);
+      document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&el&&!el.hidden) close(); });
+    }
+    return {open,close};
+  })();
+
+  /* ===== Waitlist form (FormSubmit.co stays on page, popup response) ===== */
+  (function waitlist(){
+    const form=document.getElementById("waitForm");
+    const email=document.getElementById("waitEmail");
+    const msg=document.getElementById("waitMsg");
+    const btn=document.getElementById("waitBtn");
+    if(!form) return;
+    const status=t=>{ if(msg) msg.textContent=t; };
+    form.addEventListener("submit",async(e)=>{
+      e.preventDefault();
+      if(!email.value || !email.checkValidity()){
+        email.focus();
+        Popup.open("Check your email","That doesn't look like a valid email address please try again.",true);
+        return;
+      }
+      btn.disabled=true; status("Submitting…");
+      try{
+        const res=await fetch("https://formsubmit.co/ajax/info@neosignis.com",{
+          method:"POST", headers:{ "Accept":"application/json" }, body:new FormData(form)
+        });
+        if(!res.ok) throw new Error("bad status");
+        await res.json();
+        status("You're on the list.");
+        Popup.open("You're on the list","Thanks for joining the Neosignis waitlist we'll reach out at "+email.value+" as we open early access.",false);
+        email.value="";
+      }catch(err){
+        status("");
+        Popup.open("That didn't go through","We couldn't reach the server just now. Please check your connection and try again.",true);
+      }finally{ btn.disabled=false; }
+    });
+    // Focus the email when arriving from a "Join the waitlist" link
+    document.querySelectorAll('a[href="#early"]').forEach(a=>{
+      a.addEventListener("click",()=>setTimeout(()=>{ try{ email.focus({preventScroll:true}); }catch(_){ email.focus(); } },700));
+    });
+  })();
 
   function fit(canvas){
     const dpr=Math.min(window.devicePixelRatio||1, 1.5);
@@ -802,6 +936,7 @@
     return {ctx,w:r.width,h:r.height,dpr};
   }
 
+  /* ===== WebGL ambient background (theme-aware via u_dark) ===== */
   (function webglBG(){
     const canvas=document.getElementById("webgl");
     const gl=canvas.getContext("webgl")||canvas.getContext("experimental-webgl");
@@ -858,9 +993,11 @@
     }
     if(reduceMotion){gl.uniform2f(uRes,canvas.width,canvas.height);gl.uniform1f(uTime,3.0);gl.uniform1f(uDark,window.__dark||0);gl.drawArrays(gl.TRIANGLE_STRIP,0,4);}
     else raf=requestAnimationFrame(loop);
+    // redraw once on theme change even under reduced motion
     if(tgl) tgl.addEventListener("click",()=>{ if(reduceMotion){gl.uniform1f(uDark,window.__dark||0);gl.drawArrays(gl.TRIANGLE_STRIP,0,4);} });
   })();
 
+  /* ===== HERO pipeline (theme-aware) ===== */
   (function heroPipe(){
     const canvas=document.getElementById("heroCanvas");
     if(!canvas) return;
@@ -913,6 +1050,7 @@
     requestAnimationFrame(draw);
   })();
 
+  /* ===== Avatar orb (always-dark card → fixed bright palette) ===== */
   (function avatar(){
     const canvas=document.getElementById("avatarCanvas");
     if(!canvas) return;
@@ -937,13 +1075,14 @@
     requestAnimationFrame(draw);
   })();
 
+  /* ===== Live caption typing ===== */
   (function caption(){
     const txt=document.getElementById("capTxt"),who=document.getElementById("capWho");
     if(!txt) return;
     const lines=[
-      {w:"Dr. Adeyemi · speaking", t:"Your results look good we can adjust the dosage today."},
+      {w:"Doctor · speaking", t:"Your results look good we can adjust the dosage today."},
       {w:"Patient · signing", t:"I understand. Will it change how I feel in the mornings?"},
-      {w:"Dr. Adeyemi · speaking", t:"A little. We'll check again next week to be sure."},
+      {w:"Doctor · speaking", t:"A little. We'll check again next week to be sure."},
       {w:"Patient · signing", t:"Thank you that's much clearer now."}
     ];
     let li=0;
@@ -959,6 +1098,7 @@
     typeLine();
   })();
 
+  /* ===== Architecture flow ===== */
   (function arch(){
     const svg=document.getElementById("archSvg"),archEl=document.getElementById("arch");
     if(!svg||!archEl) return;
@@ -985,13 +1125,14 @@
     requestAnimationFrame(tick);
   })();
 
+  /* ===== Use-case scene art (fixed bright palette on dark cards) ===== */
   (function scenes(){
     document.querySelectorAll(".scene .bgart").forEach(canvas=>{
       const kind=canvas.closest(".scene").dataset.art;
       let ctx,w,h;
       function resize(){const r=fit(canvas);ctx=r.ctx;w=r.w;h=r.h;}
       resize();window.addEventListener("resize",resize);
-      const seeds=[];for(let i=0;i<26;i++)seeds.push({x:Math.random(),y:Math.random(),r:Math.random(),ph:Math.random()*7});
+      const seeds=[];for(let i=0;i<18;i++)seeds.push({x:Math.random(),y:Math.random(),r:Math.random(),ph:Math.random()*7});
       let t0=performance.now()+Math.random()*1000,sk=0;
       function draw(now){
         if(!Vis.on(canvas)){requestAnimationFrame(draw);return;}
@@ -1014,6 +1155,7 @@
     });
   })();
 
+  /* ===== Community ecosystem (theme-aware) ===== */
   (function eco(){
     const canvas=document.getElementById("ecoCanvas");
     if(!canvas)return;
@@ -1038,6 +1180,47 @@
     requestAnimationFrame(draw);
   })();
 
+  /* ===== Use-case carousel (native scroll-snap, no pin) ===== */
+  (function casesCarousel(){
+    const track=document.getElementById("casesTrack");
+    const bar=document.getElementById("caseBar");
+    const prev=document.getElementById("casePrev");
+    const next=document.getElementById("caseNext");
+    if(!track) return;
+    const maxScroll=()=>track.scrollWidth-track.clientWidth;
+    let ticking=false;
+    function update(){
+      const ms=maxScroll();
+      const ratio=Math.min(1, track.clientWidth/track.scrollWidth);
+      const barW=120, indW=Math.max(22, ratio*barW);
+      const prog= ms>0 ? track.scrollLeft/ms : 0;
+      if(bar){ bar.style.width=indW+"px"; bar.style.transform=`translateX(${prog*(barW-indW)}px)`; }
+      if(prev) prev.disabled = track.scrollLeft<=2;
+      if(next) next.disabled = track.scrollLeft>=ms-2;
+    }
+    function step(dir){
+      const card=track.querySelector(".scene");
+      const gap=parseFloat(getComputedStyle(track).gap)||24;
+      const dx=(card?card.getBoundingClientRect().width:track.clientWidth*0.8)+gap;
+      track.scrollBy({left:dir*dx, behavior:reduceMotion?"auto":"smooth"});
+    }
+    if(prev) prev.addEventListener("click",()=>step(-1));
+    if(next) next.addEventListener("click",()=>step(1));
+    track.addEventListener("scroll",()=>{ if(!ticking){ticking=true;requestAnimationFrame(()=>{update();ticking=false;});} },{passive:true});
+    window.addEventListener("resize",update);
+
+    // pointer drag-to-scroll for mouse users
+    let down=false,sx=0,sl=0,moved=false;
+    track.addEventListener("pointerdown",e=>{ if(e.pointerType==="mouse"){down=true;moved=false;sx=e.clientX;sl=track.scrollLeft;track.classList.add("dragging");} });
+    window.addEventListener("pointermove",e=>{ if(down){const dx=e.clientX-sx; if(Math.abs(dx)>4)moved=true; track.scrollLeft=sl-dx;} });
+    window.addEventListener("pointerup",()=>{ if(down){down=false;track.classList.remove("dragging");update();} });
+    track.addEventListener("click",e=>{ if(moved){e.preventDefault();e.stopPropagation();} },true);
+
+    update();
+    window.addEventListener("load",update);
+  })();
+
+  /* ===== GSAP reveals + hero intro (no pinning) ===== */
   if(window.gsap){
     gsap.registerPlugin(ScrollTrigger);
     if(!reduceMotion){
@@ -1050,17 +1233,8 @@
       gsap.to(".fc-latency",{y:-16,duration:5,repeat:-1,yoyo:true,ease:"sine.inOut"});
       gsap.utils.toArray(".reveal").forEach(el=>{gsap.fromTo(el,{y:38,opacity:0},{y:0,opacity:1,duration:1,ease:"power3.out",scrollTrigger:{trigger:el,start:"top 86%"}});});
       gsap.from(".tl-step",{scrollTrigger:{trigger:".timeline",start:"top 80%"},opacity:0,x:-20,stagger:0.12,duration:.7,ease:"power2.out"});
-      const track=document.getElementById("casesTrack"),pin=document.getElementById("casesPin"),bar=document.getElementById("caseBar");
-      if(track && window.innerWidth>880){
-        gsap.to(track,{x:()=> -(track.scrollWidth - track.parentElement.clientWidth),ease:"none",
-          scrollTrigger:{trigger:pin,start:"top 14%",end:()=> "+="+(track.scrollWidth - track.parentElement.clientWidth + window.innerHeight*0.5),
-            scrub:0.6,pin:true,anticipatePin:1,invalidateOnRefresh:true,
-            onUpdate:self=>{ if(bar) bar.style.transform=`translateX(${self.progress*300}%)`; }}});
-      }
     } else {
       document.querySelectorAll(".reveal").forEach(e=>e.classList.add("is-in"));
-      const track=document.getElementById("casesTrack");
-      if(track){track.style.flexWrap="wrap";document.querySelectorAll(".scene").forEach(s=>s.style.flexBasis="100%");}
     }
     window.addEventListener("load",()=>ScrollTrigger.refresh());
   } else {
